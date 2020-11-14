@@ -13,9 +13,7 @@
     "url": "git+https://github.com/iotshaman/mysql-shaman.git"
   },
   "keywords": [
-    "json",
-    "repository",
-    "persistence",
+    "mysql",
     "node",
     "nodejs"
   ],
