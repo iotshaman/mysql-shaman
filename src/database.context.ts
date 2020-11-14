@@ -4,7 +4,7 @@ import { Pool, PoolConnection, PoolConfig, MysqlError } from 'mysql';
 import { Collection } from './collection';
 import { RunMySqlQuery } from './db.functions';
 
-export abstract class DbContext {
+export abstract class DatabaseContext {
 
   public abstract models: {[name: string]: Collection<any>};
   private pool: Pool;
