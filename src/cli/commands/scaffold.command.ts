@@ -35,6 +35,9 @@ export class ScaffoldCommand implements ICommand {
   }
 
   private scaffoldDatabase = (): Promise<void> => {
+    if (!this.config.scripts || !this.config.scripts.tables){
+      return Promise.reject("Scripts config must at least have table declarations.");
+    }
     return this.executeScripts(this.config.scripts.tables, 'table')
       .then(_ => this.executeScripts(this.config.scripts.primers || [], 'primers'))
       .then(_ => this.executeScripts(this.config.scripts.views || [], 'views'))
@@ -45,7 +48,7 @@ export class ScaffoldCommand implements ICommand {
     return this.getFilesFromGlob(patterns)
       .then(files => this.getMysqlScripts(files, type))
       .then(scripts => {
-        if (scripts.length == 0) return Promise.resolve();
+        if (scripts.length == 0) return Promise.reject("No scripts found.");
         let pool = mysql.createPool(this.config.poolConfig);
         return CreateConnection(pool).then(connection => {
           let operations = scripts.map(script => this.executeScript(connection, script));

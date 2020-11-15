@@ -20,14 +20,14 @@ describe('RunCommand', () => {
 
   it('Run should throw if no script provided', (done) => {
     let command = new RunCommand();
-    command.run(null, "config.json").catch(ex => done());
+    command.run(null, "config.json").catch(_ => done());
   });
 
   it('Run should throw if no config file found', (done) => {
     let command = new RunCommand();
     let readFileStub = sandbox.stub(fs, 'readFile');
     readFileStub.yields(new Error("testing"));
-    command.run("script.sql", "config.json").catch(ex => done());
+    command.run("script.sql").catch(_ => done());
   });
 
   it('Run should throw if no script file found', (done) => {
@@ -35,7 +35,7 @@ describe('RunCommand', () => {
     let readFileStub = sandbox.stub(fs, 'readFile');
     readFileStub.onCall(0).yields(null, '{"cwd": "./scripts"}');
     readFileStub.onCall(1).yields(new Error("testing"));
-    command.run("script.sql", "config.json").catch(ex => done());
+    command.run("script.sql").catch(_ => done());
   });
 
   it('Run should return empty promise', (done) => {
@@ -44,7 +44,7 @@ describe('RunCommand', () => {
     let readFileStub = sandbox.stub(fs, 'readFile');
     readFileStub.onCall(0).yields(null, '{"cwd": null}');
     readFileStub.onCall(1).yields(null, "placeholder");
-    command.run("script.sql", "config.json").then(ex => done());
+    command.run("script.sql").then(_ => done());
   });
 
 });
