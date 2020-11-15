@@ -1,6 +1,7 @@
 import * as _path from 'path';
 import * as _fs from 'fs';
 import * as mysql from 'mysql';
+
 import { ICommand } from "./command";
 import { MySqlShamanConfig } from '../mysql-shaman-cli.config';
 import { CreateConnection, RunMySqlQuery } from '../../mysql.functions';
