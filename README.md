@@ -67,7 +67,7 @@ database.initialize({
 });
 ```
 
-Now you are ready to go! Here is a sample of some of the operations you can perform; or a full list of operations, see [ORM Reference](#orm-reference) section.
+Now you are ready to go! Here is a sample of some of the operations you can perform; for a full list of operations, see [ORM Reference](#orm-reference) section.
 
 ```ts
 var database = new SampleDatabaseContext();

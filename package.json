@@ -1,7 +1,7 @@
 {
   "name": "mysql-shaman",
   "version": "0.0.1",
-  "description": "Access MySql database using a common generic interface.",
+  "description": "Access MySql databases using a simple, familiar ORM syntax.",
   "scripts": {
     "test": "nyc mocha",
     "build": "tsc",
