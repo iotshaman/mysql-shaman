@@ -8,6 +8,9 @@
     "coveralls": "nyc report --reporter=text-lcov | coveralls"
   },
   "private": true,
+  "bin": {
+    "mysql-shaman": "./dist/cli/mysql-shaman-cli.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/iotshaman/mysql-shaman.git"
@@ -56,6 +59,7 @@
     "all": true
   },
   "dependencies": {
+    "fast-glob": "^3.2.4",
     "mysql": "^2.18.1"
   }
 }

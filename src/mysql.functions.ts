@@ -10,10 +10,12 @@ export function CreateConnection(pool: Pool): Promise<PoolConnection> {
   });
 }
 
-export function RunMySqlQuery<T>(connection: PoolConnection, query: string, args: any): Promise<T> {
+export function RunMySqlQuery<T>(
+  connection: PoolConnection, query: string, 
+  args: any, release: boolean = true): Promise<T> {
   return new Promise<T>((res, err) => {
     connection.query(query, args, (mysqlErr, rslt) => {
-      connection.release();
+      if (release) connection.release();
       if (mysqlErr) return err(mysqlErr);
       return res(rslt);
     });
