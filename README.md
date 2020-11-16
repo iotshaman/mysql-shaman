@@ -2,22 +2,18 @@
 
 ![npm badge](https://img.shields.io/npm/v/mysql-shaman.svg) ![Build Status](https://travis-ci.org/iotshaman/mysql-shaman.svg?branch=master) [![Coverage Status](https://coveralls.io/repos/github/iotshaman/mysql-shaman/badge.svg?branch=master)](https://coveralls.io/github/iotshaman/mysql-shaman?branch=master)
 
-### Access MySql databases using a simple, familiar ORM syntax.
+## Access MySql databases using a simple, familiar ORM syntax.
 Let's be honest, the official MySql npm package leaves a lot to be desired. While it is a solid library that works as advertised, it requires users to submit queries in string form, sacrificing discoverability for the sake of simplicity. To compensate for this, many different ORM packages have been developed, with the intent to make MySql database management simpler. Unfortunately, almost all of there ORMS are extremely bulky, and often opinionated, forcing users to decide between writing hard-coded string queries, or using a bulky ORM. 
 
 The purpose of mysql-shaman is to provide a standardized ORM interface on top of the core mysql package, without adding any additional bulkiness. Now, insteading of writing hard-coded string queries, you can write your CRUD operations using javascript expressions. This significantly improves the developer experience, allowing users to leverage IDE technology to anaylze their data-access operations.
 
-Additionally, mysql-shaman includes a CLI that lets developers perform common database management operations, including (but not limited to):
+Additionally, mysql-shaman includes a CLI that lets developers perform common database management operations, including scaffolding databases, running scripts, and more. 
 
-* Scaffolding databases
-* Running query scripts
-
-### Requirements
+## Requirements
 - Node JS
 - MySql server instance
-- Typescript project (ORM ONLY)
 
-### Installation
+## Installation
 To use the mysql-shaman ORM in a Node JS project:
 ```sh
 npm install mysql-shaman --save
@@ -28,10 +24,9 @@ To use myysql-shaman CLI tool:
 npm install -g mysql-shaman --save
 ```
 
-### Quick Start
-Once you have installed mysql-shaman in your typescript project, the first thing you need to to is define your user models. These can be defined as classes or interfaces, but we reccommend classes, as this will allow future features to leverage metadata reflection. For the purposes of this demonstration, we will use the following model:
+## Quick Start
+Once you have installed mysql-shaman in your typescript project, the first thing you need to to is define your data models. Each model should represent a table (or view) in the database. Data models can be defined as classes or interfaces, but we reccommend classes, as this will allow future features to leverage metadata reflection. For the purposes of this demonstration, we will use the following model:
 
-**user.ts**
 ```ts
 export class User {
   userId?: string;
@@ -48,10 +43,12 @@ import { User } from './user.ts';
 
 export class SampleDatabaseContext extends DatabaseContext {
   models = { 
-    users: new Collection<User>() 
+    user: new Collection<User>() 
   }  
 }
 ```
+
+**IMPORTANT!!** The name of each collection should be an exact match to a table (or view) in your database (case sensitive). For example, the property 'models.user' in the class "SampleDatabaseContext" implies there is a MySql table named "user".
 
 Finally, you need to create an instance of your database context, then call it's initialization method. The initialization method takes a "PoolConfig" interface parameter (from official mysql package).
 
@@ -81,10 +78,10 @@ database.initialize({
 });
 
 // OUTPUT LIST OF ALL USERS
-database.models.users.find().then(console.dir);
+database.models.user.find().then(console.dir);
 
 // OUTPUT LIST OF USERS WITH LAST NAME OF 'Smith'
-database.models.users
+database.models.user
   .find({
     conditions: ['lastName = ?'],
     args: ['Smith']
@@ -92,7 +89,7 @@ database.models.users
   .then(console.dir);
 
 // FIND SINGLE USER WITH ID OF '1'
-database.models.users
+database.models.user
   .findOne({
     identity: 'userId',
     args: [1]
@@ -102,30 +99,30 @@ database.models.users
 // INSERT NEW USER
 let user = new User();
 user.email = 'test@test.com';
-database.models.users.insertOne(user);
+database.models.user.insertOne(user);
 
 // UPDATE USER
-database.models.users
+database.models.user
   .findOne({identity: 'email', args: ['test@test.com']})
   .then(user => {
     user.firstName = 'John';
     user.lastName = 'Smith';
-    return database.models.users.updateOne(user, {
+    return database.models.user.updateOne(user, {
       identity: 'userId',
       args: [user.userId]
     });
   });
 
 // DELETE USER
-database.models.users.deleteOne({
+database.models.user.deleteOne({
   identity: 'userId',
   args: [1]
 });
 ```
 
-### ORM Reference
+## ORM Reference
 
-#### Configuration
+### Configuration
 
 The mysql-shaman package uses the "PoolConfig" interface, from the official mysql package, for a database configuration object. Below is a snippet of the PoolConfig interface, truncated to only show the most imporant options. For a full list of options, please visit their [github page](https://github.com/mysqljs/mysql).
 
@@ -140,7 +137,7 @@ export interface PoolConfig {
 }
 ```
 
-#### Database Context
+### Database Context
 
 The database context is an abstract class that provides a convenient interface to access data. Below is the specification for the "DataContext" class:
 
@@ -162,7 +159,7 @@ export declare abstract class DatabaseContext {
 * **query** - A light wrapper around the core mysql package's "query" method. This allows developers to bypass the ORM, if need be (this is not reccommended in most use-cases).
 * **callProcedure** - Allows developers to call stored procedures through the data context. 
 
-#### Collection
+### Collection
 
 A collection is a generic class representation of a data model. Think of collections as someting you perform operations on: find, insert, update, delete, etc. Each collection should represent a table (or view) in your database. Below is the specification for the "Collection" class:
 
@@ -181,7 +178,7 @@ export declare class Collection<T> {
 }
 ```
 
-##### Entity Queries
+#### Entity Queries
 Most of the collection methods have an "EntityQuery" object parameter, and each method uses different properties. Below is a list of all properties of the "EntityQuery" interface, but please reference each method's description for implementation specifics.
 
 ```ts
@@ -194,10 +191,10 @@ export interface EntityQuery {
 }
 ```
 
-##### initialize
+#### initialize
 This is used by the "DatabaseContext" abstract class to initialize each collection. You should probably never call this manually, unless you are working with collections outside of a data context (not reccommended).
 
-##### find
+#### find
 Takes an optional "EntityQuery" object and returns an array of objects (T). If no query parameter is provided, it will return a list of all entities. Below is a list of all "EntityQuery" properties that are available (all properties are optional):
 
 ```ts
@@ -208,7 +205,7 @@ find: (query?: EntityQuery) => Promise<T[]>;
 * **conditions** - List of "WHERE" clauses. Please use '?' to represent query parameters, then pass those parameters in the 'args' property; by doing so, mysql will sanitize the inputs, helping prevent SQL injection.
 * **args** - List of arguments. Each argument should correspond to a '?' in a condition string.
 
-##### findOne
+#### findOne
 Takes a required "EntityQuery" object and returns a single object (T); null if no object found.  Below is a list of all "EntityQuery" properties that are available (* indicates a required parameter):
 
 ```ts
@@ -219,7 +216,7 @@ findOne: (query?: EntityQuery) => Promise<T>;
 * **args** (*) - A value that represents a unique object, and should match a value in the column specified in the "identity" parameter.
 * **columns** - List of column names you with to be included in the return objects. Default = "*".
 
-##### insert
+#### insert
 Inserts one-to-many new object(s) (T) into a table. Below is a list of all "EntityQuery" properties that are available (* indicates a required parameter):
 
 ```ts
@@ -230,14 +227,14 @@ insert: (query?: EntityQuery) => Promise<void>;
 * **identity** - If the table has an identity column which automatically assigns values, specify here and that column / value will not be included in the insert.
 * **columns** - List of columns to insert. This should be used in conjunction with "identity" parameter, if there is an identity column that should not be included in insert statement.
 
-##### insertOne
+#### insertOne
 Insert one object (T) into a table. 
 
 ```ts
 insertOne: (model: T) => Promise<number>;
 ```
 
-##### updateOne
+#### updateOne
 Takes an object (T) and an "EntityQuery" object and updates the corresponding database values. Below is a list of all "EntityQuery" properties that are available (all properties are required):
 
 ```ts
@@ -247,7 +244,7 @@ updateOne: (model: T, query: EntityQuery) => Promise<void>;
 * **identity** - The column name that represents a unique object. This is typically a primary key, but can be something else that is unique. 
 * **args** - A value that represents a unique object, and should match a value in the column specified in the "identity" parameter.
 
-##### delete
+#### delete
 Deletes one-to-many object(s) (T) from a database table. Below is a list of all "EntityQuery" properties that are available (all properties are required):
 
 ```ts
@@ -257,7 +254,7 @@ Deletes one-to-many object(s) (T) from a database table. Below is a list of all 
 * **conditions** - List of "WHERE" clauses. Please use '?' to represent query parameters, then pass those parameters in the 'args' property; by doing so, mysql will sanitize the inputs, helping prevent SQL injection.
 * **args** - List of arguments. Each argument should correspond to a '?' in a condition string.
 
-##### deleteOne
+#### deleteOne
 Deletes an object (T) from a database table. Below is a list of all "EntityQuery" properties that are available (all properties are required):
 
 ```ts
@@ -267,7 +264,7 @@ deleteOne: (query: EntityQuery) => Promise<void>;
 * **identity** - The column name that represents a unique object. This is typically a primary key, but can be something else that is unique. 
 * **args** - A value that represents a unique object, and should match a value in the column specified in the "identity" parameter.
 
-### CLI Reference
+## CLI Reference
 
 The mysql-shaman CLI provides a convenient way to perform common database operations, without having to login to mysql in a terminal, or though Workbench, etc. Store your database scripts in .sql files, configure the mysql-shaman CLI, then start running commands.
 
@@ -277,7 +274,7 @@ The mysql-shaman CLI follows the following format:
 mysql-shaman [command] [...arguments]
 ```
 
-#### Configuration
+### Configuration
 Before configuring the mysql-shaman CLI, you should already have a project folder with database files, typically with .sql extensions. Inside this project folder, create a file called 'mysql-shaman.json'. This file should follow the below interface specification:
 
 ```ts
@@ -300,7 +297,7 @@ export interface MySqlShamanConfig {
 
 (\*) *indicates a required field*
 
-#### Scaffold Command
+### Scaffold Command
 The scaffold command takes 1 optional argument then runs all the configured scripts (see above). The scripts are run in sequential order, based on the glob patterns provided in your configuration file's "scripts" property. The only required script type is "table", all others are optional. 
 
 ```sh
@@ -316,7 +313,7 @@ Since certain types of scripts rely on certain other scripts, the scaffold comma
 
 If you need the scripts, inside of each category, to run sequentially, specify them explicity in the configuration file, in the order you wish them to run. 
 
-#### Run Command
+### Run Command
 The run command takes 1 required parameter and 1 optional parameter then runs the specified script on the configured database.
 
 ```sh

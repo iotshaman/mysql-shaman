@@ -1,6 +1,6 @@
 {
   "name": "mysql-shaman",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Access MySql databases using a simple, familiar ORM syntax.",
   "scripts": {
     "test": "nyc mocha",
