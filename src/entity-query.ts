@@ -4,4 +4,5 @@ export interface EntityQuery {
   columns?: string[];
   conditions?: string[];
   limit?: number;
+  debug?: boolean;
 }

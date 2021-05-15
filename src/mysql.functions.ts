@@ -31,6 +31,11 @@ export function GetMySqlColumns(query: EntityQuery): string {
   return CreateCommaDelimitedList(query.columns);
 }
 
+export function GetMySqlUpdateColumns(query: EntityQuery): string {
+  if (!query || !query.columns) throw new Error("Columns must be provided when performing update.");
+  return CreateCommaDelimitedList(query.columns.map(c => `${c} = ?`));
+}
+
 export function GetMySqlConditions(query: EntityQuery) {
   if (!query || !query.conditions || query.conditions.length == 0) return '';
   return query.conditions.reduce((a, b) => {

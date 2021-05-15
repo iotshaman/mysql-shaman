@@ -8,7 +8,8 @@ import {
   RunMySqlQuery, 
   CreateCommaDelimitedList,
   GetMySqlColumns,
-  GetMySqlConditions
+  GetMySqlConditions,
+  GetMySqlUpdateColumns
 } from './mysql.functions';
 
 describe('MySql Functions', () => {
@@ -67,6 +68,29 @@ describe('MySql Functions', () => {
   it('GetMySqlColumns should return comma delimited list', () => {
     let result = GetMySqlColumns({columns: ['a', 'b', 'c']});
     expect(result).to.equal('a, b, c');
+  });
+//
+  it('GetMySqlUpdateColumns should throw if query is null', () => {
+    try {
+      GetMySqlUpdateColumns(null);
+      throw new Error("Should have thrown.")
+    } catch(ex) {
+      expect(ex.message).to.equal("Columns must be provided when performing update.");
+    }
+  });
+
+  it('GetMySqlUpdateColumns should throw if no columns provided', () => {
+    try {
+      GetMySqlUpdateColumns({});
+      throw new Error("Should have thrown.")
+    } catch(ex) {
+      expect(ex.message).to.equal("Columns must be provided when performing update.");
+    }
+  });
+
+  it('GetMySqlUpdateColumns should return comma delimited list', () => {
+    let result = GetMySqlUpdateColumns({columns: ['a', 'b', 'c']});
+    expect(result).to.equal('a = ?, b = ?, c = ?');
   });
 
   it('GetMySqlConditions should return empty string if query is null', () => {

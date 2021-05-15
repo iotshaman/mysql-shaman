@@ -96,7 +96,7 @@ describe('Collections', () => {
     getPoolConnectionMock(null, {insertId: 0}).then((connection: any) => {
       foo = new Collection();
       foo.initialize('foo', () => Promise.resolve(connection));
-      foo.insertOne({bar: 0}).then(rslt => {
+      foo.insertOne({bar: 0}, true).then(rslt => {
         expect(rslt).to.equal(0);
         done();
       });
@@ -122,6 +122,18 @@ describe('Collections', () => {
       foo.updateOne({id: 0, bar: 0}, {identity: 'id', args: [0]}).then(_ => {
         let query = connection.query.getCall(0).args[0];
         expect(query).to.equal('UPDATE foo SET ? WHERE id = ?');
+        done();
+      });
+    });
+  });
+
+  it('update should run update query', (done) => {
+    getPoolConnectionMock().then((connection: any) => {
+      foo = new Collection();
+      foo.initialize('foo', () => Promise.resolve(connection));
+      foo.update({id: 0, bar: 0}, {columns: ['bar'], conditions: ['foo = ?'], args: [0]}).then(_ => {
+        let query = connection.query.getCall(0).args[0];
+        expect(query).to.equal('UPDATE foo SET bar = ? WHERE foo = ?');
         done();
       });
     });

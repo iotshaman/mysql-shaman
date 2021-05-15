@@ -172,6 +172,7 @@ export declare class Collection<T> {
     findOne: (query: EntityQuery) => Promise<T>;
     insert: (query: EntityQuery) => Promise<void>;
     insertOne: (model: T) => Promise<number>;
+    update: (model: T, query: EntityQuery) => Promise<void>;
     updateOne: (model: T, query: EntityQuery) => Promise<void>;
     delete: (query: EntityQuery) => Promise<void>;
     deleteOne: (query: EntityQuery) => Promise<void>;
@@ -233,6 +234,17 @@ Insert one object (T) into a table.
 ```ts
 insertOne: (model: T) => Promise<number>;
 ```
+
+#### update
+Takes an object (T) and an "EntityQuery" object and updates the corresponding database values. Below is a list of all "EntityQuery" properties that are available (all properties are required):
+
+```ts
+update: (model: T, query: EntityQuery) => Promise<void>;
+```
+
+* **columns**: A list of columns to update; only these column values will be updated.
+* **conditions** - List of "WHERE" clauses. Please use '?' to represent query parameters, then pass those parameters in the 'args' property; by doing so, mysql will sanitize the inputs, helping prevent SQL injection. 
+* **args** - A value that represents a unique object, and should match a value in the column specified in the "identity" parameter.
 
 #### updateOne
 Takes an object (T) and an "EntityQuery" object and updates the corresponding database values. Below is a list of all "EntityQuery" properties that are available (all properties are required):

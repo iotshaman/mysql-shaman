@@ -1,6 +1,6 @@
 import { PoolConnection, OkPacket } from 'mysql';
 import { EntityQuery } from './entity-query';
-import { RunMySqlQuery, GetMySqlColumns, GetMySqlConditions } from './mysql.functions';
+import { RunMySqlQuery, GetMySqlColumns, GetMySqlConditions, GetMySqlUpdateColumns } from './mysql.functions';
 
 export class Collection<T> {
 
@@ -17,14 +17,14 @@ export class Collection<T> {
     let columns = GetMySqlColumns(query);
     let qString = `SELECT ${columns} FROM ${this.name}`;
     let conditions = GetMySqlConditions(query);
-    if (!conditions) return this.execute(`${qString};`, query.args);
+    if (!conditions) return this.execute(`${qString};`, query.args, query.debug);
     return this.execute(`${qString} WHERE ${conditions};`, query.args);
   }
 
   findOne = (query: EntityQuery): Promise<T> => {
     let columns = GetMySqlColumns(query);
     let qString = `SELECT ${columns} FROM ${this.name} WHERE ${query.identity} = ? LIMIT 1;`;
-    let req = this.execute<T[]>(qString, query.args);
+    let req = this.execute<T[]>(qString, query.args, query.debug);
     return req.then(rslt => rslt.length == 0 ? null : rslt[0]);
   }
 
@@ -36,12 +36,21 @@ export class Collection<T> {
     });
     let columns = GetMySqlColumns(query);
     let qString = `INSERT INTO ${this.name} (${columns}) VALUES ?`;
-    return this.execute(`${qString};`, [args]);
+    return this.execute(`${qString};`, [args], query.debug);
   }
 
-  insertOne = (model: T): Promise<number> => {
+  insertOne = (model: T, debug: boolean = false): Promise<number> => {
     let qString = `INSERT INTO ${this.name} SET ?;`;
-    return this.execute<OkPacket>(qString, model).then(ok => ok.insertId);
+    return this.execute<OkPacket>(qString, model, debug).then(ok => ok.insertId);
+  }
+
+  update = (model: T, query: EntityQuery): Promise<void> => {
+    let columns = GetMySqlUpdateColumns(query);
+    let conditions = GetMySqlConditions(query);
+    let qString = `UPDATE ${this.name} SET ${columns} WHERE ${conditions}`;
+    let columnValues = query.columns.map(c => model[c]);
+    let args = [...columnValues, ...query.args];
+    return this.execute<void>(qString, args, query.debug).then(_ => (null));
   }
 
   updateOne = (model: T, query: EntityQuery): Promise<void> => {
@@ -56,15 +65,19 @@ export class Collection<T> {
     if (!query.conditions) return Promise.reject("Delete all operation not allowed.");
     let qString = `DELETE FROM ${this.name}`;
     let conditions = GetMySqlConditions(query);
-    return this.execute(`${qString} WHERE ${conditions};`, query.args).then(_ => (null));
+    return this.execute(`${qString} WHERE ${conditions};`, query.args, query.debug).then(_ => (null));
   }
 
   deleteOne = (query: EntityQuery): Promise<void> => {
     let qString = `DELETE FROM ${this.name} WHERE ${query.identity} = ?;`;
-    return this.execute<void>(qString, query.args).then(_ => (null));
+    return this.execute<void>(qString, query.args, query.debug).then(_ => (null));
   }
 
-  private execute<T>(query: string, args: any = null) {
+  private execute<T>(query: string, args: any = null, debug: boolean = false) {
+    if (!!debug) {
+      console.log(`Query string: ${query}`);
+      console.log(`Query params: ${JSON.stringify(args)}`);
+    }
     return this.connectionFactory()
       .then(conn => RunMySqlQuery<T>(conn, query, args));
   }
