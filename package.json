@@ -1,6 +1,6 @@
 {
   "name": "mysql-shaman",
-  "version": "0.0.5",
+  "version": "1.0.0",
   "description": "Access MySql databases using a simple, familiar ORM syntax.",
   "main": "dist/index.js",
   "scripts": {
