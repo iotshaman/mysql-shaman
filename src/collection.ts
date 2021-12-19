@@ -18,7 +18,7 @@ export class Collection<T> {
     let qString = `SELECT ${columns} FROM ${this.name}`;
     let conditions = GetMySqlConditions(query);
     if (!conditions) return this.execute(`${qString};`, query.args, query.debug);
-    return this.execute(`${qString} WHERE ${conditions};`, query.args);
+    return this.execute(`${qString} WHERE ${conditions};`, query.args, query.debug);
   }
 
   findOne = (query: EntityQuery): Promise<T> => {
@@ -58,7 +58,7 @@ export class Collection<T> {
     let keys = Object.keys(model).filter(k => k != query.identity);
     let object: any = keys.reduce((a, b) => { a[b] = model[b]; return a; }, {});
     let args = [object, ...query.args];
-    return this.execute<void>(qString, args).then(_ => (null));
+    return this.execute<void>(qString, args, query.debug).then(_ => (null));
   }
 
   delete = (query: EntityQuery): Promise<void> => {
@@ -71,6 +71,20 @@ export class Collection<T> {
   deleteOne = (query: EntityQuery): Promise<void> => {
     let qString = `DELETE FROM ${this.name} WHERE ${query.identity} = ?;`;
     return this.execute<void>(qString, query.args, query.debug).then(_ => (null));
+  }
+
+  first = (columnName: string): Promise<T> => {
+    if (!columnName) return Promise.reject(new Error("Column name not provided"));
+    let qString = `"SELECT * FROM ${this.name} ORDER BY ${columnName} ASC LIMIT 1;`;
+    let req = this.execute<T[]>(qString, []);
+    return req.then(rslt => rslt.length == 0 ? null : rslt[0]);
+  }
+
+  last = (columnName: string): Promise<T> => {
+    if (!columnName) return Promise.reject(new Error("Column name not provided"));
+    let qString = `"SELECT * FROM ${this.name} ORDER BY ${columnName} DESC LIMIT 1;`;
+    let req = this.execute<T[]>(qString, []);
+    return req.then(rslt => rslt.length == 0 ? null : rslt[0]);
   }
 
   private execute<T>(query: string, args: any = null, debug: boolean = false) {

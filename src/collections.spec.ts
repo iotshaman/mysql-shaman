@@ -171,6 +171,66 @@ describe('Collections', () => {
     });
   });
 
+  it('first should throw error if no column name provided', (done) => {
+    getPoolConnectionMock(null, {insertId: 0}).then((connection: any) => {
+      foo = new Collection();
+      foo.initialize('foo', () => Promise.resolve(connection));
+      foo.first("").catch(_ => done());
+    });
+  });
+
+  it('first should return null', (done) => {
+    getPoolConnectionMock(null, []).then((connection: any) => {
+      foo = new Collection();
+      foo.initialize('foo', () => Promise.resolve(connection));
+      foo.first("id").then(rslt=> {
+        expect(rslt).to.be.null;
+        done();
+      });
+    });
+  });
+
+  it('first should return result', (done) => {
+    getPoolConnectionMock(null, [{id: 0, bar: 0}]).then((connection: any) => {
+      foo = new Collection();
+      foo.initialize('foo', () => Promise.resolve(connection));
+      foo.first("id").then(rslt=> {
+        expect(rslt).not.to.be.null;
+        done();
+      });
+    });
+  });
+
+  it('last should throw error if no column name provided', (done) => {
+    getPoolConnectionMock(null, {insertId: 0}).then((connection: any) => {
+      foo = new Collection();
+      foo.initialize('foo', () => Promise.resolve(connection));
+      foo.last("").catch(_ => done());
+    });
+  });
+
+  it('last should return null', (done) => {
+    getPoolConnectionMock(null, []).then((connection: any) => {
+      foo = new Collection();
+      foo.initialize('foo', () => Promise.resolve(connection));
+      foo.last("id").then(rslt=> {
+        expect(rslt).to.be.null;
+        done();
+      });
+    });
+  });
+
+  it('last should return result', (done) => {
+    getPoolConnectionMock(null, [{id: 0, bar: 0}]).then((connection: any) => {
+      foo = new Collection();
+      foo.initialize('foo', () => Promise.resolve(connection));
+      foo.last("id").then(rslt=> {
+        expect(rslt).not.to.be.null;
+        done();
+      });
+    });
+  });
+
 });
 
 interface Foo {
