@@ -1,6 +1,4 @@
 import 'mocha';
-import * as mysql from 'mysql';
-import * as sinon from "sinon";
 import { expect } from 'chai';
 import { Collection } from './collection';
 import { getPoolConnectionMock } from './mysql.functions.spec';
@@ -201,6 +199,17 @@ describe('Collections', () => {
     });
   });
 
+  it('first should return result from conditional search', (done) => {
+    getPoolConnectionMock(null, [{id: 0, bar: 0}]).then((connection: any) => {
+      foo = new Collection();
+      foo.initialize('foo', () => Promise.resolve(connection));
+      foo.first("id", {conditions: ['bar = ?'], args: [0]}).then(rslt=> {
+        expect(rslt).not.to.be.null;
+        done();
+      });
+    });
+  });
+
   it('last should throw error if no column name provided', (done) => {
     getPoolConnectionMock(null, {insertId: 0}).then((connection: any) => {
       foo = new Collection();
@@ -225,6 +234,17 @@ describe('Collections', () => {
       foo = new Collection();
       foo.initialize('foo', () => Promise.resolve(connection));
       foo.last("id").then(rslt=> {
+        expect(rslt).not.to.be.null;
+        done();
+      });
+    });
+  });
+
+  it('last should return result from conditional search', (done) => {
+    getPoolConnectionMock(null, [{id: 0, bar: 0}]).then((connection: any) => {
+      foo = new Collection();
+      foo.initialize('foo', () => Promise.resolve(connection));
+      foo.last("id", {conditions: ['bar = ?'], args: [0]}).then(rslt=> {
         expect(rslt).not.to.be.null;
         done();
       });

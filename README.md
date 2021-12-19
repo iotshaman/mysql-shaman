@@ -276,6 +276,28 @@ deleteOne: (query: EntityQuery) => Promise<void>;
 * **identity** - The column name that represents a unique object. This is typically a primary key, but can be something else that is unique. 
 * **args** - A value that represents a unique object, and should match a value in the column specified in the "identity" parameter.
 
+#### first
+Takes a column name and an optional "EntityQuery" object and returns the first record, sorted by the provided column name. If query parameter are provided, the query will be modified accordingly before finding the first record. Below is a list of all "EntityQuery" properties that are available (all properties are optional):
+
+```ts
+first: (columnName: string, query?: EntityQuery) => Promise<T>;
+```
+
+* **columns** - List of column names you with to be included in the return objects. Default = "*".
+* **conditions** - List of "WHERE" clauses. Please use '?' to represent query parameters, then pass those parameters in the 'args' property; by doing so, mysql will sanitize the inputs, helping prevent SQL injection.
+* **args** - List of arguments. Each argument should correspond to a '?' in a condition string.
+
+#### last
+Takes a column name and an optional "EntityQuery" object and returns the last record, sorted by the provided column name. If query parameter are provided, the query will be modified accordingly before finding the last record. Below is a list of all "EntityQuery" properties that are available (all properties are optional):
+
+```ts
+last: (columnName: string, query?: EntityQuery) => Promise<T>;
+```
+
+* **columns** - List of column names you with to be included in the return objects. Default = "*".
+* **conditions** - List of "WHERE" clauses. Please use '?' to represent query parameters, then pass those parameters in the 'args' property; by doing so, mysql will sanitize the inputs, helping prevent SQL injection.
+* **args** - List of arguments. Each argument should correspond to a '?' in a condition string.
+
 ## CLI Reference
 
 The mysql-shaman CLI provides a convenient way to perform common database operations, without having to login to mysql in a terminal, or though Workbench, etc. Store your database scripts in .sql files, configure the mysql-shaman CLI, then start running commands.

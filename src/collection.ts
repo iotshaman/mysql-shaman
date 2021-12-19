@@ -73,17 +73,25 @@ export class Collection<T> {
     return this.execute<void>(qString, query.args, query.debug).then(_ => (null));
   }
 
-  first = (columnName: string): Promise<T> => {
+  first = (columnName: string, query?: EntityQuery): Promise<T> => {
     if (!columnName) return Promise.reject(new Error("Column name not provided"));
-    let qString = `"SELECT * FROM ${this.name} ORDER BY ${columnName} ASC LIMIT 1;`;
-    let req = this.execute<T[]>(qString, []);
+    let columns = GetMySqlColumns(query);
+    let qString = `SELECT ${columns} FROM ${this.name}`;
+    let conditions = GetMySqlConditions(query);
+    if (!conditions) qString = `${qString} ORDER BY ${columnName} ASC LIMIT 1;`;
+    else qString = `${qString} WHERE ${conditions} ORDER BY ${columnName} ASC LIMIT 1;`;
+    let req = this.execute<T[]>(qString, query?.args, query?.debug);
     return req.then(rslt => rslt.length == 0 ? null : rslt[0]);
   }
 
-  last = (columnName: string): Promise<T> => {
+  last = (columnName: string, query?: EntityQuery): Promise<T> => {
     if (!columnName) return Promise.reject(new Error("Column name not provided"));
-    let qString = `"SELECT * FROM ${this.name} ORDER BY ${columnName} DESC LIMIT 1;`;
-    let req = this.execute<T[]>(qString, []);
+    let columns = GetMySqlColumns(query);
+    let qString = `SELECT ${columns} FROM ${this.name}`;
+    let conditions = GetMySqlConditions(query);
+    if (!conditions) qString = `${qString} ORDER BY ${columnName} DESC LIMIT 1;`;
+    else qString = `${qString} WHERE ${conditions} ORDER BY ${columnName} DESC LIMIT 1;`;
+    let req = this.execute<T[]>(qString, query?.args, query?.debug);
     return req.then(rslt => rslt.length == 0 ? null : rslt[0]);
   }
 
