@@ -328,7 +328,7 @@ export interface MySqlShamanConfig {
 ```
 
 * **poolConfig** (*) - mysql PoolConfig configuration ([see above](#orm-reference)).  
-* **adminPoolConfig** - mysql PoolConfig configuration ([see above](#orm-reference)) for the [Build Command](#build-command). This is the same as the *poolConfig* variable, except the user provided should have GRANT permissions.  You should provide a null (or undefined) value for the database property.
+* **adminPoolConfig** - mysql PoolConfig configuration ([see above](#orm-reference)) for running operations on the root MySql context. This is the same as the *poolConfig* variable, except the user provided should have GRANT permissions, and you should provide a null (or undefined) value for the database property. The only commands that use this config property are *build*, and *grant*.
 * **cwd** - Allows developers to configure the root folder where .sql files are stored. This should be relative to the folder that contains your 'mysql-shaman.json' file.
 * **remote** - Set to true if your MySql instance is on a remote machine (default = false). 
 * **scripts** - There are currently 4 different types of scripts that mysql-shaman can process: tables, primers, views, and procedures. For each of these, you can specify "glob" patterns to tell mysql-shaman how to find those particular types of files. 
@@ -366,6 +366,21 @@ Since certain types of scripts rely on certain other scripts, the scaffold comma
 4. procedures
 
 If you need the scripts, inside of each category, to run sequentially, specify them explicity in the configuration file, in the order you wish them to run. 
+
+### Grant Command
+The grant command takes 3 arguments (userName, databaseName, and role) and will grant the provided user with all permissions associated with the provided role, on the provided database. The following roles are available:
+
+- **readonly:** Provides the following grants: "SELECT".
+- **service:** Provides the following grants: "INSERT", "SELECT", "UPDATE", "DELETE", and "EXECUTE".
+- **admin:** Provides the following grants: "INSERT", "SELECT", "UPDATE", "DELETE", "EXECUTE", "CREATE", and "DROP".
+
+The syntax for the build command is as follows:
+
+```sh
+mysql-shaman grant [userName] [databaseName] [role] [config path (optional)]
+```
+
+*Note: to run this command you need to have a populated "adminPoolConfig" value in your mysql-shaman.json file, and the user credentials provided should have GRANT permissions, and the ability to create databases.*
 
 ### Run Command
 The run command takes 1 required parameter and 1 optional parameter then runs the specified script on the configured database.

@@ -4,6 +4,7 @@ import { RunCommand } from "./commands/run.command";
 import { BuildCommand } from "./commands/build.command";
 import { PoolConfig } from "mysql";
 import { DatabaseService } from "../services/database.service";
+import { GrantCommand } from "./commands/grant.command";
 
 export class MySqlShaman {
 
@@ -22,5 +23,6 @@ export class MySqlShaman {
 const MySqlShamanCommands: ICommand[] = [
   new ScaffoldCommand(),
   new RunCommand(),
-  new BuildCommand((config: PoolConfig, scope: string) => new DatabaseService(config, scope))
+  new BuildCommand((config: PoolConfig, scope: string) => new DatabaseService(config, scope)),
+  new GrantCommand((config: PoolConfig, scope: string) => new DatabaseService(config, scope))
 ]

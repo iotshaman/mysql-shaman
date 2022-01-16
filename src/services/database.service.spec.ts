@@ -1,3 +1,4 @@
+import { expect } from 'chai';
 import 'mocha';
 import * as sinon from "sinon";
 
@@ -26,6 +27,27 @@ describe('Database Service', () => {
     mockDatabasePool(sandbox);
     let subject = new DatabaseService({});
     subject.buildDatabase("", "", "").then(_ => done());
+  });
+
+  it('addUser should return resolved promise', (done) => {
+    mockDatabasePool(sandbox);
+    let subject = new DatabaseService({});
+    subject.addUser("", "").then(_ => done());
+  });
+
+  it('grantUserPermissions should throw if invalid role provided', (done) => {
+    mockDatabasePool(sandbox);
+    let subject = new DatabaseService({});
+    subject.grantUserPermissions("", "", "invalid").catch(ex => {
+      expect(ex.message).to.equal("Invalid role: invalid.")
+      done();
+    })
+  });
+
+  it('grantUserPermissions should return resolved promise', (done) => {
+    mockDatabasePool(sandbox);
+    let subject = new DatabaseService({});
+    subject.grantUserPermissions("", "", "readonly").then(_ => done());
   });
 
 });

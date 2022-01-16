@@ -1,36 +1,32 @@
 import * as _path from 'path';
 import * as _fs from 'fs';
-import * as _password from 'password-generator';
 import { PoolConfig } from 'mysql';
 
 import { ICommand } from "./command";
 import { MySqlShamanConfig } from '../mysql-shaman-cli.config';
 import { IDatabaseService } from '../../services/database.service';
 
-export class BuildCommand implements ICommand {
+export class GrantCommand implements ICommand {
 
-  get name(): string { return "build"; }
+  get name(): string { return "grant"; }
 
   constructor(private databaseServiceFactory: (config: PoolConfig, scope: string) => IDatabaseService) {
 
   }
 
-  run = (databaseName: string, user: string, configPath: string = "mysql-shaman.json"): Promise<void> => {
-    if (!databaseName) return Promise.reject(new Error("Database name parameter not provided."));
+  run = (user: string, databaseName: string, role: string, configPath: string = "mysql-shaman.json"): Promise<void> => {
     if (!user) return Promise.reject(new Error("User name parameter not provided."));
+    if (!databaseName) return Promise.reject(new Error("Database name parameter not provided."));
+    if (!role) return Promise.reject(new Error("Role parameter not provided."));
     let fullConfigPath = _path.join(process.cwd(), configPath);
-    let buildCommand = this.getConfig(fullConfigPath).then(config => {
+    let grantCommand = this.getConfig(fullConfigPath).then(config => {
       if (!config.adminPoolConfig) throw new Error("No admin pool config found.");
       let scope = config.remote ? '%' : 'localhost';
       let databaseService = this.databaseServiceFactory(config.adminPoolConfig, scope);
-      let password = _password(12, false);  
-      return databaseService.buildDatabase(databaseName, user, password).then(_ => (password));
+      return databaseService.grantUserPermissions(user, databaseName, role);
     });
-    return buildCommand.then(password => {
-      console.log('Database build complete.');
-      console.log(`\r\nAdmin user: ${user}`);
-      console.log(`Admin password: ${password}\r\n`);
-      console.log('Please save the above user credentials in a secure password manager.');
+    return grantCommand.then(_ => {
+      console.log(`Permissions have been granted for user ${user} on ${databaseName}.`);
     });
   }
 
