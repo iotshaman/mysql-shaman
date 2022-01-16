@@ -40,14 +40,6 @@ describe('ScaffoldCommand', () => {
     command.run().catch(_ => done());
   });
 
-  it('Run should throw if no scripts found', (done) => {
-    let command = new ScaffoldCommand();
-    let readFileStub = sandbox.stub(fs, 'readFile');
-    readFileStub.onCall(0).yields(null, '{"scripts": {"tables": ["*"]}}');
-    sandbox.stub(command, 'globService').returns(Promise.resolve([]));
-    command.run().catch(_ => done());
-  });
-
   it('Run should throw if script cannot be read', (done) => {
     let command = new ScaffoldCommand();
     let readFileStub = sandbox.stub(fs, 'readFile');
@@ -64,6 +56,20 @@ describe('ScaffoldCommand', () => {
     readFileStub.onCall(0).yields(null, '{"scripts": {"tables": ["*"]}}');
     readFileStub.yields(null, 'placeholder');
     sandbox.stub(command, 'globService').returns(Promise.resolve(["script.sql"]));
+    command.run().then(_ => done());
+  });
+
+  it('Run should return empty promise for table scripts if no scripts available for types other than table', (done) => {
+    mockDatabasePool(sandbox);
+    let command = new ScaffoldCommand();
+    let readFileStub = sandbox.stub(fs, 'readFile');
+    readFileStub.onCall(0).yields(null, '{"scripts": {"tables": ["*"], "primers": ["*"]}}');
+    readFileStub.yields(null, 'placeholder');
+    let globServiceMock = sandbox.stub(command, 'globService');
+    globServiceMock.onCall(0).returns(Promise.resolve(["script.sql"]));
+    globServiceMock.onCall(1).returns(Promise.resolve([]));
+    globServiceMock.onCall(2).returns(Promise.resolve([]));
+    globServiceMock.onCall(3).returns(Promise.resolve([]));
     command.run().then(_ => done());
   });
 

@@ -48,7 +48,10 @@ export class ScaffoldCommand implements ICommand {
     return this.getFilesFromGlob(patterns)
       .then(files => this.getMysqlScripts(files, type))
       .then(scripts => {
-        if (scripts.length == 0) return Promise.reject("No scripts found.");
+        if (scripts.length == 0) {
+          console.log(`No scripts found for script type '${type}'.`);
+          return Promise.resolve();
+        }
         let pool = mysql.createPool(this.config.poolConfig);
         return CreateConnection(pool).then(connection => {
           let operations = scripts.map(script => this.executeScript(connection, script));
