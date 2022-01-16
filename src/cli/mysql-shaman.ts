@@ -1,6 +1,9 @@
 import { ICommand } from "./commands/command";
 import { ScaffoldCommand } from "./commands/scaffold.command";
 import { RunCommand } from "./commands/run.command";
+import { BuildCommand } from "./commands/build.command";
+import { PoolConfig } from "mysql";
+import { DatabaseService } from "../services/database.service";
 
 export class MySqlShaman {
 
@@ -15,7 +18,9 @@ export class MySqlShaman {
 
 }
 
+/* istanbul ignore next */
 const MySqlShamanCommands: ICommand[] = [
   new ScaffoldCommand(),
-  new RunCommand()
+  new RunCommand(),
+  new BuildCommand((config: PoolConfig) => new DatabaseService(config))
 ]
