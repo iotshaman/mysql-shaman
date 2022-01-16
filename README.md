@@ -128,12 +128,12 @@ The mysql-shaman package uses the "PoolConfig" interface, from the official mysq
 
 ```ts
 export interface PoolConfig {
-    connectionLimit: number;
-    host: string;
-    user: string;
-    password: string;
-    database: string;
-    waitForConnections: boolean;
+  connectionLimit: number;
+  host: string;
+  user: string;
+  password: string;
+  database: string;
+  waitForConnections: boolean;
 }
 ```
 
@@ -145,12 +145,12 @@ The database context is an abstract class that provides a convenient interface t
 import { PoolConfig } from 'mysql';
 import { Collection } from './collection';
 export declare abstract class DatabaseContext {
-    abstract models: {
-        [name: string]: Collection<any>;
-    };
-    initialize: (config: PoolConfig) => void;
-    protected query: <T>(query: string, args: any) => Promise<T>;
-    protected callProcedure: <T>(procedure: string, args: any[]) => Promise<T>;
+  abstract models: {
+    [name: string]: Collection<any>;
+  };
+  initialize: (config: PoolConfig) => void;
+  protected query: <T>(query: string, args: any) => Promise<T>;
+  protected callProcedure: <T>(procedure: string, args: any[]) => Promise<T>;
 }
 ```
 
@@ -167,15 +167,15 @@ A collection is a generic class representation of a data model. Think of collect
 import { PoolConnection } from 'mysql';
 import { EntityQuery } from './entity-query';
 export declare class Collection<T> {
-    initialize: (name: string, connectionFactory: () => Promise<PoolConnection>) => void;
-    find: (query?: EntityQuery) => Promise<T[]>;
-    findOne: (query: EntityQuery) => Promise<T>;
-    insert: (query: EntityQuery) => Promise<void>;
-    insertOne: (model: T) => Promise<number>;
-    update: (model: T, query: EntityQuery) => Promise<void>;
-    updateOne: (model: T, query: EntityQuery) => Promise<void>;
-    delete: (query: EntityQuery) => Promise<void>;
-    deleteOne: (query: EntityQuery) => Promise<void>;
+  initialize: (name: string, connectionFactory: () => Promise<PoolConnection>) => void;
+  find: (query?: EntityQuery) => Promise<T[]>;
+  findOne: (query: EntityQuery) => Promise<T>;
+  insert: (query: EntityQuery) => Promise<void>;
+  insertOne: (model: T) => Promise<number>;
+  update: (model: T, query: EntityQuery) => Promise<void>;
+  updateOne: (model: T, query: EntityQuery) => Promise<void>;
+  delete: (query: EntityQuery) => Promise<void>;
+  deleteOne: (query: EntityQuery) => Promise<void>;
 }
 ```
 
@@ -184,11 +184,11 @@ Most of the collection methods have an "EntityQuery" object parameter, and each 
 
 ```ts
 export interface EntityQuery {
-    identity?: string;
-    args?: any[];
-    columns?: string[];
-    conditions?: string[];
-    limit?: number;
+  identity?: string;
+  args?: any[];
+  columns?: string[];
+  conditions?: string[];
+  limit?: number;
 }
 ```
 
@@ -314,22 +314,40 @@ Before configuring the mysql-shaman CLI, you should already have a project folde
 ```ts
 import { PoolConfig } from 'mysql';
 export interface MySqlShamanConfig {
-    poolConfig: PoolConfig;
-    cwd?: string;
-    scripts?: {
-        tables: string[];
-        primers?: string[];
-        views?: string[];
-        procedures?: string[];
-    };
+  poolConfig: PoolConfig;
+  adminPoolConfig?: PoolConfig;
+  cwd?: string;
+  scripts?: {
+    tables: string[];
+    primers?: string[];
+    views?: string[];
+    procedures?: string[];
+  };
 }
 ```
 
-* **poolConfig** (*) - mysql PoolConfig configuration ([see above](#orm-reference)).
-* **cwd** - Allows developers to configure the root folder where .sql files are stored. This should be relative to the folder that contains your 'mysql-shaman.json' file.
+* **poolConfig** (*) - mysql PoolConfig configuration ([see above](#orm-reference)).  
+* **adminPoolConfig** - mysql PoolConfig configuration ([see above](#orm-reference)) for the [Build Command](#build-command). This is the same as the *poolConfig* variable, except the user provided should have GRANT permissions.  You should provide a null (or undefined) value for the database property.
+* **cwd** - Allows developers to configure the root folder where .sql files are stored. This should be relative to the folder that contains your 'mysql-shaman.json' file.  
 * **scripts** - There are currently 4 different types of scripts that mysql-shaman can process: tables, primers, views, and procedures. For each of these, you can specify "glob" patterns to tell mysql-shaman how to find those particular types of files. 
 
 (\*) *indicates a required field*
+
+### Build Command
+The build command takes 2 arguments (databaseName and userName) and will perform the following actions:
+
+- Create the database, from the provided database name value.
+- Create the user, from the provided user name value.
+- Setup permissions for the provided user, on the provided database.
+- Output the password of the newly created user
+
+The syntax for the build command is as follows:
+
+```sh
+mysql-shaman build [databaseName] [userName] [config path (optional)]
+```
+
+*Note: to run this command you need to have a populated "adminPoolConfig" value in your mysql-shaman.json file, and the user credentials provided should have GRANT permissions, and the ability to create databases.*
 
 ### Scaffold Command
 The scaffold command takes 1 optional argument then runs all the configured scripts (see above). The scripts are run in sequential order, based on the glob patterns provided in your configuration file's "scripts" property. The only required script type is "table", all others are optional. 
