@@ -317,6 +317,7 @@ export interface MySqlShamanConfig {
   poolConfig: PoolConfig;
   adminPoolConfig?: PoolConfig;
   cwd?: string;
+  remote?: boolean;
   scripts?: {
     tables: string[];
     primers?: string[];
@@ -328,7 +329,8 @@ export interface MySqlShamanConfig {
 
 * **poolConfig** (*) - mysql PoolConfig configuration ([see above](#orm-reference)).  
 * **adminPoolConfig** - mysql PoolConfig configuration ([see above](#orm-reference)) for the [Build Command](#build-command). This is the same as the *poolConfig* variable, except the user provided should have GRANT permissions.  You should provide a null (or undefined) value for the database property.
-* **cwd** - Allows developers to configure the root folder where .sql files are stored. This should be relative to the folder that contains your 'mysql-shaman.json' file.  
+* **cwd** - Allows developers to configure the root folder where .sql files are stored. This should be relative to the folder that contains your 'mysql-shaman.json' file.
+* **remote** - Set to true if your MySql instance is on a remote machine (default = false). 
 * **scripts** - There are currently 4 different types of scripts that mysql-shaman can process: tables, primers, views, and procedures. For each of these, you can specify "glob" patterns to tell mysql-shaman how to find those particular types of files. 
 
 (\*) *indicates a required field*

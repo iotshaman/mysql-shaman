@@ -11,7 +11,7 @@ export class BuildCommand implements ICommand {
 
   get name(): string { return "build"; }
 
-  constructor(private databaseServiceFactory: (config: PoolConfig) => IDatabaseService) {
+  constructor(private databaseServiceFactory: (config: PoolConfig, scope: string) => IDatabaseService) {
 
   }
 
@@ -21,7 +21,8 @@ export class BuildCommand implements ICommand {
     let fullConfigPath = _path.join(process.cwd(), configPath);
     let buildCommand = this.getConfig(fullConfigPath).then(config => {
       if (!config.adminPoolConfig) throw new Error("No admin pool config found.");
-      let databaseService = this.databaseServiceFactory(config.adminPoolConfig);
+      let scope = config.remote ? '%' : 'localhost';
+      let databaseService = this.databaseServiceFactory(config.adminPoolConfig, scope);
       let password = _password(12, false);  
       return databaseService.buildDatabase(databaseName, user, password).then(_ => (password));
     });

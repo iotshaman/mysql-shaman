@@ -4,6 +4,7 @@ export interface MySqlShamanConfig {
   poolConfig: PoolConfig;
   adminPoolConfig?: PoolConfig;
   cwd?: string;
+  remote?: boolean;
   scripts?: {
     tables: string[];
     primers?: string[];

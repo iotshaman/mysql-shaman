@@ -22,5 +22,5 @@ export class MySqlShaman {
 const MySqlShamanCommands: ICommand[] = [
   new ScaffoldCommand(),
   new RunCommand(),
-  new BuildCommand((config: PoolConfig) => new DatabaseService(config))
+  new BuildCommand((config: PoolConfig, scope: string) => new DatabaseService(config, scope))
 ]

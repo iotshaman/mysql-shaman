@@ -38,6 +38,8 @@ export class DatabaseService implements IDatabaseService {
       `GRANT UPDATE ON ${database} . * TO '${user}'@'${this.scope}';`,
       `GRANT DELETE ON ${database} . * TO '${user}'@'${this.scope}';`,
       `GRANT EXECUTE ON ${database} . * TO '${user}'@'${this.scope}';`,
+      `GRANT CREATE ON ${database} . * TO '${user}'@'${this.scope}';`,
+      `GRANT DROP ON ${database} . * TO '${user}'@'${this.scope}';`,
       'FLUSH PRIVILEGES;'
     ];
     return commands.reduce((a, b) => 
