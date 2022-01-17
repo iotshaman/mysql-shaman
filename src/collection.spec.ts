@@ -251,6 +251,28 @@ describe('Collections', () => {
     });
   });
 
+  it('exists should return false', (done) => {
+    getPoolConnectionMock(null, []).then((connection: any) => {
+      foo = new Collection();
+      foo.initialize('foo', () => Promise.resolve(connection));
+      foo.exists({conditions: ['bar = ?'], args: [0]}).then(rslt=> {
+        expect(rslt).not.to.be.true;
+        done();
+      });
+    });
+  });
+
+  it('exists should return true', (done) => {
+    getPoolConnectionMock(null, [{id: 0, bar: 0}]).then((connection: any) => {
+      foo = new Collection();
+      foo.initialize('foo', () => Promise.resolve(connection));
+      foo.exists({conditions: ['bar = ?'], args: [0]}).then(rslt=> {
+        expect(rslt).to.be.true;
+        done();
+      });
+    });
+  });
+
 });
 
 interface Foo {

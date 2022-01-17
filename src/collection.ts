@@ -95,6 +95,10 @@ export class Collection<T> {
     return req.then(rslt => rslt.length == 0 ? null : rslt[0]);
   }
 
+  exists = (query: EntityQuery): Promise<boolean> => {
+    return this.findOne(query).then(rslt => !!rslt);
+  }
+
   private execute<T>(query: string, args: any = null, debug: boolean = false) {
     if (!!debug) {
       console.log(`Query string: ${query}`);

@@ -171,11 +171,14 @@ export declare class Collection<T> {
   find: (query?: EntityQuery) => Promise<T[]>;
   findOne: (query: EntityQuery) => Promise<T>;
   insert: (query: EntityQuery) => Promise<void>;
-  insertOne: (model: T) => Promise<number>;
+  insertOne: (model: T, debug?: boolean) => Promise<number>;
   update: (model: T, query: EntityQuery) => Promise<void>;
   updateOne: (model: T, query: EntityQuery) => Promise<void>;
   delete: (query: EntityQuery) => Promise<void>;
   deleteOne: (query: EntityQuery) => Promise<void>;
+  first: (columnName: string, query?: EntityQuery) => Promise<T>;
+  last: (columnName: string, query?: EntityQuery) => Promise<T>;
+  exists: (query: EntityQuery) => Promise<boolean>;
 }
 ```
 
@@ -210,7 +213,7 @@ find: (query?: EntityQuery) => Promise<T[]>;
 Takes a required "EntityQuery" object and returns a single object (T); null if no object found.  Below is a list of all "EntityQuery" properties that are available (* indicates a required parameter):
 
 ```ts
-findOne: (query?: EntityQuery) => Promise<T>;
+findOne: (query: EntityQuery) => Promise<T>;
 ```
 
 * **identity** (*) - The column name that represents a unique object. This is typically a primary key, but can be something else that is unique. 
@@ -221,7 +224,7 @@ findOne: (query?: EntityQuery) => Promise<T>;
 Inserts one-to-many new object(s) (T) into a table. Below is a list of all "EntityQuery" properties that are available (* indicates a required parameter):
 
 ```ts
-insert: (query?: EntityQuery) => Promise<void>;
+insert: (query: EntityQuery) => Promise<void>;
 ```
 
 * **args** (*) - List of objects (T) to insert. 
@@ -297,6 +300,16 @@ last: (columnName: string, query?: EntityQuery) => Promise<T>;
 * **columns** - List of column names you with to be included in the return objects. Default = "*".
 * **conditions** - List of "WHERE" clauses. Please use '?' to represent query parameters, then pass those parameters in the 'args' property; by doing so, mysql will sanitize the inputs, helping prevent SQL injection.
 * **args** - List of arguments. Each argument should correspond to a '?' in a condition string.
+
+#### exists
+Takes a required "EntityQuery" object and returns true if an entity is found, and false if no entity is found.  Below is a list of all "EntityQuery" properties that are available (* indicates a required parameter):
+
+```ts
+exists: (query: EntityQuery) => Promise<boolean>;
+```
+
+* **identity** (*) - The column name that represents a unique object. This is typically a primary key, but can be something else that is unique. 
+* **args** (*) - A value that represents a unique object, and should match a value in the column specified in the "identity" parameter.
 
 ## CLI Reference
 
