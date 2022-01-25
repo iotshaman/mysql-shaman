@@ -2,9 +2,10 @@ import { ICommand } from "./commands/command";
 import { ScaffoldCommand } from "./commands/scaffold.command";
 import { RunCommand } from "./commands/run.command";
 import { BuildCommand } from "./commands/build.command";
-import { PoolConfig } from "mysql";
-import { DatabaseService } from "../services/database.service";
 import { GrantCommand } from "./commands/grant.command";
+import { AddUserCommand } from "./commands/adduser.command";
+import { PasswordInputFactory } from "../factories/password-input.factory";
+import { DatabaseServiceFactory } from "../factories/database-service.factory";
 
 export class MySqlShaman {
 
@@ -23,6 +24,7 @@ export class MySqlShaman {
 const MySqlShamanCommands: ICommand[] = [
   new ScaffoldCommand(),
   new RunCommand(),
-  new BuildCommand((config: PoolConfig, scope: string) => new DatabaseService(config, scope)),
-  new GrantCommand((config: PoolConfig, scope: string) => new DatabaseService(config, scope))
+  new BuildCommand(DatabaseServiceFactory),
+  new GrantCommand(DatabaseServiceFactory),
+  new AddUserCommand(PasswordInputFactory, DatabaseServiceFactory)
 ]

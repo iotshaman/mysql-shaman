@@ -380,6 +380,21 @@ Since certain types of scripts rely on certain other scripts, the scaffold comma
 
 If you need the scripts, inside of each category, to run sequentially, specify them explicity in the configuration file, in the order you wish them to run. 
 
+### Add User Command
+The add user command takes 1 arguments (userName) and will perform the following actions:
+
+- Promt the user for password.
+- Promt the user to confirm password.
+- Create the user, from the provided username / password values.
+
+The syntax for the adduser command is as follows:
+
+```sh
+mysql-shaman adduser [userName] [config path (optional)]
+```
+
+*Note: to run this command you need to have a populated "adminPoolConfig" value in your mysql-shaman.json file, and the user credentials provided should have GRANT permissions.*
+
 ### Grant Command
 The grant command takes 3 arguments (userName, databaseName, and role) and will grant the provided user with all permissions associated with the provided role, on the provided database. The following roles are available:
 
@@ -393,7 +408,7 @@ The syntax for the build command is as follows:
 mysql-shaman grant [userName] [databaseName] [role] [config path (optional)]
 ```
 
-*Note: to run this command you need to have a populated "adminPoolConfig" value in your mysql-shaman.json file, and the user credentials provided should have GRANT permissions, and the ability to create databases.*
+*Note: to run this command you need to have a populated "adminPoolConfig" value in your mysql-shaman.json file, and the user credentials provided should have GRANT permissions.*
 
 ### Run Command
 The run command takes 1 required parameter and 1 optional parameter then runs the specified script on the configured database.
