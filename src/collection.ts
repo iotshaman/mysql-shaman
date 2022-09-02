@@ -6,6 +6,7 @@ export class Collection<T> {
 
   private name: string;
   private connectionFactory: () => Promise<PoolConnection>;
+  private transactionConnection: PoolConnection;
 
   initialize = (name: string, connectionFactory: () => Promise<PoolConnection>) => {
     this.name = name;
@@ -99,12 +100,21 @@ export class Collection<T> {
     return this.findOne(query).then(rslt => !!rslt);
   }
 
+  beginTransaction = (connection: PoolConnection): void => {
+    this.transactionConnection = connection;
+  }
+
+  endTransaction = () => {
+    this.transactionConnection = null;
+  }
+
   private execute<T>(query: string, args: any = null, debug: boolean = false) {
     if (!!debug) {
       console.log(`Query string: ${query}`);
       console.log(`Query params: ${JSON.stringify(args)}`);
     }
-    return this.connectionFactory()
-      .then(conn => RunMySqlQuery<T>(conn, query, args));
+    if (!this.transactionConnection) return this.connectionFactory()
+      .then(conn => RunMySqlQuery<T>(conn, query, args, true));
+    return RunMySqlQuery<T>(this.transactionConnection, query, args);
   }
 }
