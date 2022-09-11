@@ -38,14 +38,14 @@ describe('DatabaseContext', () => {
     let subject = new SampleDatabaseContext();
     subject.initialize({});
     subject.sampleBeginTransaction().then(_ => done());
-  })
+  });
 
-  // it('beginTransaction should throw if connection.beginTransaction throws', (done) => {
-  //   mockDatabasePool(sandbox);
-  //   let subject = new SampleDatabaseContext();
-  //   subject.initialize({});
-  //   subject.beginTransaction().then(_ => done());
-  // });
+  it('beginTransaction should throw is sql transaction throws', (done) => {
+    mockDatabasePool(sandbox, undefined, new Error("Test"));
+    let subject = new SampleDatabaseContext();
+    subject.initialize({});
+    subject.sampleBeginTransaction().catch(_ => done());
+  });
 
   it('endTransaction should return void promise if there is no existing transaction connection', (done) => {
     mockDatabasePool(sandbox);
@@ -63,14 +63,58 @@ describe('DatabaseContext', () => {
       .then(_ => done());
   });
 
-  it('endTransaction sould return void promise if tansaction connection exists and rollback set to true', (done) => {
+  it('endTransaction should return void promise if tansaction connection exists and rollback set to true', (done) => {
     mockDatabasePool(sandbox);
     let subject = new SampleDatabaseContext();
     subject.initialize({});
     subject.sampleBeginTransaction()
       .then(_ => subject.sampleEndTransaction(true))
       .then(_ => done());
-  })
+  });
+
+  it('endTransaction should throw on rollback if sql rollback request throws', (done) => {
+    let connection = getDatabaseConnectionMock();
+    connection.rollback = sinon.stub().yields(new Error("Test"));
+    let pool = getDatabasePoolMock(connection);
+    sandbox.stub(mysql, 'createPool').returns(<any>pool);
+    let subject = new SampleDatabaseContext();
+    subject.initialize({});
+    subject.sampleBeginTransaction()
+      .then(_ => subject.sampleEndTransaction(true))
+      .catch(_ => done());
+  });
+
+  it('endTransaction should throw if commit fails and rollback fails', (done) => {
+    let connection = getDatabaseConnectionMock();
+    connection.commit = sinon.stub().yields(new Error("Test"));
+    connection.rollback = sinon.stub().yields(new Error("Test"));
+    let pool = getDatabasePoolMock(connection);
+    sandbox.stub(mysql, 'createPool').returns(<any>pool);
+    let subject = new SampleDatabaseContext();
+    subject.initialize({});
+    subject.sampleBeginTransaction()
+      .then(_ => subject.sampleEndTransaction())
+      .catch(ex => {
+        expect(ex.message).to.equal("A critical error occured while committing.");
+        done();
+      });
+  });
+
+  it('endTransaction should throw original error if commit fails and rollback succeeds', (done) => {
+    let connection = getDatabaseConnectionMock();
+    connection.commit = sinon.stub().yields(new Error("Test"));
+    connection.rollback = sinon.stub().yields(null);
+    let pool = getDatabasePoolMock(connection);
+    sandbox.stub(mysql, 'createPool').returns(<any>pool);
+    let subject = new SampleDatabaseContext();
+    subject.initialize({});
+    subject.sampleBeginTransaction()
+      .then(_ => subject.sampleEndTransaction())
+      .catch(ex => {
+        expect(ex.message).to.equal("Test");
+        done();
+      });
+  });
 
 });
 
@@ -86,16 +130,25 @@ class Foo {
   bar: string;
 }
 
-export function mockDatabasePool(sandbox: sinon.SinonSandbox, connectionError: Error = null): void {
-  let pool = {
-    getConnection: sinon.stub().yields(connectionError, {
-      query: sinon.stub().yields(null, null),
-      release: () => (null),
-      beginTransaction: sinon.stub().yields(null, (ex) => { }),
-      endTransaction: () => (null),
-      commit: sinon.stub().yields(null, (ex) => { }),
-      rollback: sinon.stub().yields(null, (ex) => { })
-    })
-  }
+export function mockDatabasePool(sandbox: sinon.SinonSandbox, connectionError?: Error, yieldsError?: Error): void {
+  let connection = getDatabaseConnectionMock(yieldsError);
+  let pool = getDatabasePoolMock(connection, connectionError);
   sandbox.stub(mysql, 'createPool').returns(<any>pool);
+}
+
+export function getDatabasePoolMock(connection: any, connectionError?: Error): any {
+  return {
+    getConnection: sinon.stub().yields(connectionError, connection)
+  };
+}
+
+export function getDatabaseConnectionMock(yieldsError?: Error): any {
+  return {
+    query: sinon.stub().yields(null, null),
+    release: () => (null),
+    beginTransaction: sinon.stub().yields(yieldsError),
+    endTransaction: () => (null),
+    commit: sinon.stub().yields(null),
+    rollback: sinon.stub().yields(yieldsError)
+  }
 }

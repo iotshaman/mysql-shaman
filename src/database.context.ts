@@ -38,8 +38,8 @@ export abstract class DatabaseContext {
       });
       else this.transactionConnection.commit(null, ex => {
         if (!!ex) this.transactionConnection.rollback(null, ex2 => {
-          if (!!ex2) return err("A critical error occured while committing.");
-          err(ex.message);
+          if (!!ex2) return err(new Error("A critical error occured while committing."));
+          err(ex);
         });
         this.transactionConnection.release();
         res();

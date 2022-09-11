@@ -20,7 +20,7 @@ describe('RunCommand', () => {
 
   it('Run should throw if no script provided', (done) => {
     let command = new RunCommand();
-    command.run(null, "config.json").catch(_ => done());
+    command.run('', "config.json").catch(_ => done());
   });
 
   it('Run should throw if no config file found', (done) => {
