@@ -33,6 +33,21 @@ describe('DatabaseContext', () => {
     subject.sampleProcedure(['a', 'b']).then(_ => done());
   });
 
+  it('callProcedure should return void promise in transaction scope', (done) => {
+    mockDatabasePool(sandbox);
+    let subject = new SampleDatabaseContext();
+    subject.initialize({});
+    subject.beginTransaction().then(_ => {
+      subject.sampleProcedure(['a', 'b']).then(_ => done());
+    }).catch(console.dir);
+  });
+
+  it('beginTransaction should throw is unable to create connection', (done) => {
+    mockDatabasePool(sandbox);
+    let subject = new SampleDatabaseContext();
+    subject.sampleBeginTransaction().catch(_ => done());
+  });
+
   it('beginTransaction should return void promise', (done) => {
     mockDatabasePool(sandbox);
     let subject = new SampleDatabaseContext();
