@@ -67,7 +67,7 @@ export class DatabaseService implements IDatabaseService {
 
 /* istanbul ignore next */
 const GrantRolePermissions: {[role: string]: string[]} = {
-  admin: ["INSERT", "SELECT", "UPDATE", "DELETE", "EXECUTE", "CREATE", "DROP"],
+  admin: ["INSERT", "SELECT", "UPDATE", "DELETE", "EXECUTE", "CREATE", "DROP", "CREATE VIEW", "CREATE PROCEDURE"],
   service: ["INSERT", "SELECT", "UPDATE", "DELETE", "EXECUTE"],
   readonly: ["SELECT"]
 }

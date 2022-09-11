@@ -145,17 +145,21 @@ The database context is an abstract class that provides a convenient interface t
 import { PoolConfig } from 'mysql';
 import { Collection } from './collection';
 export declare abstract class DatabaseContext {
-  abstract models: {
-    [name: string]: Collection<any>;
-  };
-  initialize: (config: PoolConfig) => void;
-  protected query: <T>(query: string, args: any) => Promise<T>;
-  protected callProcedure: <T>(procedure: string, args: any[]) => Promise<T>;
+    abstract models: {
+        [name: string]: Collection<any>;
+    };
+    initialize: (config: PoolConfig) => void;
+    beginTransaction: () => Promise<void>;
+    endTransaction: (rollback?: boolean) => Promise<void>;
+    protected query: <T>(query: string, args: any) => Promise<T>;
+    protected callProcedure: <T>(procedure: string, args: any[]) => Promise<T>;
 }
 ```
 
 * **models** - The "models" abstract property must be implemented by all concrete classes, and contains a key-value pair of model names to "Collections" (see below). The name property must **EXACTLY** match the table name, as defined in your MySql database.
 * **initialize** - Takes a configuration object and uses it to initialize the database pool connection manager. 
+* **beginTransaction** - Create a database transaction.
+* **endTransaction** - Ends an existing database transaction. Takes an optional parameter, rollback, and when provided with a truthy value it will rollback any staged transactions before ending transaction. 
 * **query** - A light wrapper around the core mysql package's "query" method. This allows developers to bypass the ORM, if need be (this is not reccommended in most use-cases).
 * **callProcedure** - Allows developers to call stored procedures through the data context. 
 
@@ -400,7 +404,7 @@ The grant command takes 3 arguments (userName, databaseName, and role) and will 
 
 - **readonly:** Provides the following grants: "SELECT".
 - **service:** Provides the following grants: "INSERT", "SELECT", "UPDATE", "DELETE", and "EXECUTE".
-- **admin:** Provides the following grants: "INSERT", "SELECT", "UPDATE", "DELETE", "EXECUTE", "CREATE", and "DROP".
+- **admin:** Provides the following grants: "INSERT", "SELECT", "UPDATE", "DELETE", "EXECUTE", "CREATE", "DROP", "CREATE VIEW", and "CREATE PROCEDURE".
 
 The syntax for the build command is as follows:
 

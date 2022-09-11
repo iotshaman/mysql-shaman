@@ -273,6 +273,19 @@ describe('Collections', () => {
     });
   });
 
+  it('find should run select all query against transaction', (done) => {
+    getPoolConnectionMock().then((connection: any) => {
+      foo = new Collection();
+      foo.initialize('foo', () => Promise.resolve(connection));
+      foo.beginTransaction(connection);
+      foo.find().then(_ => {
+        let query = connection.query.getCall(0).args[0];
+        expect(query).to.equal('SELECT * FROM foo;');
+        done();
+      });
+    });    
+  });
+
 });
 
 interface Foo {

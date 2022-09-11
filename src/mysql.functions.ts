@@ -26,17 +26,17 @@ export function CreateCommaDelimitedList(array: string[]): string {
   return array.reduce((a, b) => `${a}${!a ? "" : ", "}${b}`, "");
 }
 
-export function GetMySqlColumns(query: EntityQuery): string {
+export function GetMySqlColumns(query: EntityQuery | null): string {
   if (!query || !query.columns) return '*';
   return CreateCommaDelimitedList(query.columns);
 }
 
-export function GetMySqlUpdateColumns(query: EntityQuery): string {
+export function GetMySqlUpdateColumns(query: EntityQuery | null): string {
   if (!query || !query.columns) throw new Error("Columns must be provided when performing update.");
   return CreateCommaDelimitedList(query.columns.map(c => `${c} = ?`));
 }
 
-export function GetMySqlConditions(query: EntityQuery) {
+export function GetMySqlConditions(query: EntityQuery | null) {
   if (!query || !query.conditions || query.conditions.length == 0) return '';
   return query.conditions.reduce((a, b) => {
     return `${a}${a == "" ? "" : " AND "}${b}`;

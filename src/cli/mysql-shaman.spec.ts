@@ -13,7 +13,7 @@ describe('MySqlShaman', () => {
   it('RunCommand should throw if no command provided', () => {
     let factory = new MySqlShaman([new MockCommand()]);
     let msg = "Command parameter not provided.";
-    expect(() => factory.RunCommand(null, [])).to.throw(msg);
+    expect(() => factory.RunCommand('', [])).to.throw(msg);
   });
 
   it('RunCommand should throw if invalid command', () => {
