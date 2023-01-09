@@ -105,6 +105,6 @@ export class Collection<T> {
       console.log(`Query params: ${JSON.stringify(args)}`);
     }
     return this.connectionFactory()
-      .then(rslt => RunMySqlQuery<T>(rslt.connection, query, args, !rslt.connection));
+      .then(rslt => RunMySqlQuery<T>(rslt.connection, query, args, !rslt.transaction));
   }
 }
