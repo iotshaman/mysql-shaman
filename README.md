@@ -50,7 +50,7 @@ export class SampleDatabaseContext extends DatabaseContext {
 
 **IMPORTANT!!** The name of each collection should be an exact match to a table (or view) in your database (case sensitive). For example, the property 'models.user' in the class "SampleDatabaseContext" implies there is a MySql table named "user".
 
-Finally, you need to create an instance of your database context, then call it's initialization method. The initialization method takes a "PoolConfig" interface parameter (from official mysql package).
+Finally, you need to create an instance of your database context, then call it's initialization method. The initialization method takes a "PoolOptions" interface parameter (from official mysql package).
 
 ```ts
 var database = new SampleDatabaseContext();
@@ -124,10 +124,10 @@ database.models.user.deleteOne({
 
 ### Configuration
 
-The mysql-shaman package uses the "PoolConfig" interface, from the official mysql package, for a database configuration object. Below is a snippet of the PoolConfig interface, truncated to only show the most imporant options. For a full list of options, please visit their [github page](https://github.com/mysqljs/mysql).
+The mysql-shaman package uses the "PoolOptions" interface, from the official mysql2 package, for a database configuration object. Below is a snippet of the PoolOptions interface, truncated to only show the most imporant options. For a full list of options, please visit their [github page](https://github.com/sidorares/node-mysql2).
 
 ```ts
-export interface PoolConfig {
+export interface PoolOptions {
   connectionLimit: number;
   host: string;
   user: string;
@@ -142,13 +142,13 @@ export interface PoolConfig {
 The database context is an abstract class that provides a convenient interface to access data. Below is the specification for the "DataContext" class:
 
 ```ts
-import { PoolConfig } from 'mysql';
+import { PoolOptions } from 'mysql2';
 import { Collection } from './collection';
 export declare abstract class DatabaseContext {
     abstract models: {
         [name: string]: Collection<any>;
     };
-    initialize: (config: PoolConfig) => void;
+    initialize: (config: PoolOptions) => void;
     beginTransaction: () => Promise<void>;
     endTransaction: (rollback?: boolean) => Promise<void>;
     protected query: <T>(query: string, args: any) => Promise<T>;
@@ -168,7 +168,7 @@ export declare abstract class DatabaseContext {
 A collection is a generic class representation of a data model. Think of collections as someting you perform operations on: find, insert, update, delete, etc. Each collection should represent a table (or view) in your database. Below is the specification for the "Collection" class:
 
 ```ts
-import { PoolConnection } from 'mysql';
+import { PoolConnection } from 'mysql2';
 import { EntityQuery } from './entity-query';
 export declare class Collection<T> {
   initialize: (name: string, connectionFactory: () => Promise<PoolConnection>) => void;
@@ -329,10 +329,10 @@ mysql-shaman [command] [...arguments]
 Before configuring the mysql-shaman CLI, you should already have a project folder with database files, typically with .sql extensions. Inside this project folder, create a file called 'mysql-shaman.json'. This file should follow the below interface specification:
 
 ```ts
-import { PoolConfig } from 'mysql';
+import { PoolOptions } from 'mysql2';
 export interface MySqlShamanConfig {
-  poolConfig: PoolConfig;
-  adminPoolConfig?: PoolConfig;
+  poolConfig: PoolOptions;
+  adminPoolConfig?: PoolOptions;
   cwd?: string;
   remote?: boolean;
   scripts?: {
@@ -344,8 +344,8 @@ export interface MySqlShamanConfig {
 }
 ```
 
-* **poolConfig** (*) - mysql PoolConfig configuration ([see above](#orm-reference)).  
-* **adminPoolConfig** - mysql PoolConfig configuration ([see above](#orm-reference)) for running operations on the root MySql context. This is the same as the *poolConfig* variable, except the user provided should have GRANT permissions, and you should provide a null (or undefined) value for the database property. The only commands that use this config property are *build*, and *grant*.
+* **poolConfig** (*) - mysql2 PoolOptions configuration ([see above](#orm-reference)).  
+* **adminPoolConfig** - mysql2 PoolOptions configuration ([see above](#orm-reference)) for running operations on the root MySql context. This is the same as the *poolConfig* variable, except the user provided should have GRANT permissions, and you should provide a null (or undefined) value for the database property. The only commands that use this config property are *build*, and *grant*.
 * **cwd** - Allows developers to configure the root folder where .sql files are stored. This should be relative to the folder that contains your 'mysql-shaman.json' file.
 * **remote** - Set to true if your MySql instance is on a remote machine (default = false). 
 * **scripts** - There are currently 4 different types of scripts that mysql-shaman can process: tables, primers, views, and procedures. For each of these, you can specify "glob" patterns to tell mysql-shaman how to find those particular types of files. 

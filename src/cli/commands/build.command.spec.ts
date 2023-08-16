@@ -19,28 +19,28 @@ describe('Build Command', () => {
   });
 
   it('name should equal "build"', () => {
-    let command = new BuildCommand((_a, _b) => (null));
+    let command = new BuildCommand((_a, _b) => (<any>null));
     expect(command.name).to.equal("build");
   });
 
   it('Run should throw if no database name provided', (done) => {
-    let command = new BuildCommand((_a, _b) => (null));
-    command.run(null, "testuser", "config.json").catch(ex => {
+    let command = new BuildCommand((_a, _b) => (<any>null));
+    command.run(<any>null, "testuser", "config.json").catch(ex => {
       expect(ex.message).to.equal('Database name parameter not provided.');
       done();
     });
   });
 
   it('Run should throw if no user provided', (done) => {
-    let command = new BuildCommand((_a, _b) => (null));
-    command.run("sample", null, "config.json").catch(ex => {
+    let command = new BuildCommand((_a, _b) => (<any>null));
+    command.run("sample", <any>null, "config.json").catch(ex => {
       expect(ex.message).to.equal('User name parameter not provided.');
       done();
     });
   });
 
   it('Run should throw if no config file not found', (done) => {
-    let command = new BuildCommand((_a, _b) => (null));
+    let command = new BuildCommand((_a, _b) => (<any>null));
     let readFileStub = sandbox.stub(fs, 'readFile');
     readFileStub.yields(new Error("testing"));
     command.run("sample", "testuser").catch(_ => done());

@@ -1,5 +1,5 @@
 import 'mocha';
-import * as mysql from 'mysql';
+import * as mysql from 'mysql2';
 import * as sinon from "sinon";
 import { expect } from 'chai';
 import { mockDatabasePool } from './database.context.spec';

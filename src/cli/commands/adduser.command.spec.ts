@@ -19,27 +19,27 @@ describe('Add User Command', () => {
   });
 
   it('name should equal "adduser"', () => {
-    let command = new AddUserCommand(() => (null), (_a, _b) => (null));
+    let command = new AddUserCommand(() => (<any>null), (_a, _b) => (<any>null));
     expect(command.name).to.equal("adduser");
   });
 
   it('Run should throw if no user provided', (done) => {
-    let command = new AddUserCommand(() => (null), (_a, _b) => (null));
-    command.run(null, "config.json").catch(ex => {
+    let command = new AddUserCommand(() => (<any>null), (_a, _b) => (<any>null));
+    command.run(<any>null, "config.json").catch(ex => {
       expect(ex.message).to.equal('User name parameter not provided.');
       done();
     });
   });
 
   it('Run should throw if no config file not found', (done) => {
-    let command = new AddUserCommand(() => (null), (_a, _b) => (null));
+    let command = new AddUserCommand(() => (<any>null), (_a, _b) => (<any>null));
     let readFileStub = sandbox.stub(fs, 'readFile');
     readFileStub.yields(new Error("testing"));
     command.run("testuser").catch(_ => done());
   });
 
   it('Run should throw if no admin pool config found', (done) => {
-    let command = new AddUserCommand(() => (null), (_a, _b) => new MockDatabaseService());
+    let command = new AddUserCommand(() => (<any>null), (_a, _b) => new MockDatabaseService());
     let readFileStub = sandbox.stub(fs, 'readFile');
     readFileStub.onCall(0).yields(null, '{}');
     command.run("testuser").catch(ex => {

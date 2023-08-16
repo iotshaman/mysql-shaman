@@ -2,7 +2,7 @@ import * as _path from 'path';
 import * as _fs from 'fs';
 import * as _password from 'password-generator';
 import { Interface } from 'readline';
-import { PoolConfig } from 'mysql';
+import { PoolOptions } from 'mysql2';
 
 import { ICommand } from "./command";
 import { MySqlShamanConfig } from '../mysql-shaman-cli.config';
@@ -14,7 +14,7 @@ export class AddUserCommand implements ICommand {
 
   constructor(
     private passwordInputFactory: () => Interface,
-    private databaseServiceFactory: (config: PoolConfig, scope: string) => IDatabaseService) {
+    private databaseServiceFactory: (config: PoolOptions, scope: string) => IDatabaseService) {
       
   }
 

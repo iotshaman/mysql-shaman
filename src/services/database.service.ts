@@ -1,5 +1,5 @@
-import * as mysql from 'mysql';
-import { PoolConnection, PoolConfig } from 'mysql';
+import * as mysql from 'mysql2';
+import { PoolConnection, PoolOptions } from 'mysql2';
 import { CreateConnection, RunMySqlQuery } from '../mysql.functions';
 
 export interface IDatabaseService {
@@ -10,7 +10,7 @@ export interface IDatabaseService {
 
 export class DatabaseService implements IDatabaseService {
   
-  constructor(private mysqlConfig: PoolConfig, private scope: string = 'localhost') {
+  constructor(private mysqlConfig: PoolOptions, private scope: string = 'localhost') {
     
   }
 

@@ -1,6 +1,6 @@
 import * as _path from 'path';
 import * as _fs from 'fs';
-import { PoolConfig } from 'mysql';
+import { PoolOptions } from 'mysql2';
 
 import { ICommand } from "./command";
 import { MySqlShamanConfig } from '../mysql-shaman-cli.config';
@@ -10,7 +10,7 @@ export class GrantCommand implements ICommand {
 
   get name(): string { return "grant"; }
 
-  constructor(private databaseServiceFactory: (config: PoolConfig, scope: string) => IDatabaseService) {
+  constructor(private databaseServiceFactory: (config: PoolOptions, scope: string) => IDatabaseService) {
 
   }
 

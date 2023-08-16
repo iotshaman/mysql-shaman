@@ -1,4 +1,4 @@
-import { PoolConnection, OkPacket } from 'mysql';
+import { PoolConnection, OkPacket } from 'mysql2';
 import { EntityQuery } from './entity-query';
 import { RunMySqlQuery, GetMySqlColumns, GetMySqlConditions, GetMySqlUpdateColumns } from './mysql.functions';
 

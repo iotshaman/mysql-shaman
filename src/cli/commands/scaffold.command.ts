@@ -1,11 +1,11 @@
 import * as _glob from 'fast-glob';
 import * as _path from 'path';
 import * as _fs from 'fs';
-import * as mysql from 'mysql';
+import * as mysql from 'mysql2';
 
 import { ICommand } from "./command";
 import { MySqlShamanConfig } from '../mysql-shaman-cli.config';
-import { PoolConnection } from 'mysql';
+import { PoolConnection } from 'mysql2';
 import { MysqlScript } from '../mysql-script';
 import { CreateConnection, RunMySqlQuery } from '../../mysql.functions';
 

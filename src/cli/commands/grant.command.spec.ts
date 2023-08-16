@@ -19,36 +19,36 @@ describe('Grant Command', () => {
   });
 
   it('name should equal "grant"', () => {
-    let command = new GrantCommand((_a, _b) => (null));
+    let command = new GrantCommand((_a, _b) => (<any>null));
     expect(command.name).to.equal("grant");
   });
 
   it('Run should throw if no user name provided', (done) => {
-    let command = new GrantCommand((_a, _b) => (null));
-    command.run(null, "sample", "readonly", "config.json").catch(ex => {
+    let command = new GrantCommand((_a, _b) => (<any>null));
+    command.run(<any>null, "sample", "readonly", "config.json").catch(ex => {
       expect(ex.message).to.equal('User name parameter not provided.');
       done();
     });
   });
 
   it('Run should throw if no database name provided', (done) => {
-    let command = new GrantCommand((_a, _b) => (null));
-    command.run("testuser", null, "readonly", "config.json").catch(ex => {
+    let command = new GrantCommand((_a, _b) => (<any>null));
+    command.run("testuser", <any>null, "readonly", "config.json").catch(ex => {
       expect(ex.message).to.equal('Database name parameter not provided.');
       done();
     });
   });
 
   it('Run should throw if no database name provided', (done) => {
-    let command = new GrantCommand((_a, _b) => (null));
-    command.run("testuser", "sample", null, "config.json").catch(ex => {
+    let command = new GrantCommand((_a, _b) => (<any>null));
+    command.run("testuser", "sample", <any>null, "config.json").catch(ex => {
       expect(ex.message).to.equal('Role parameter not provided.');
       done();
     });
   });
 
   it('Run should throw if no config file not found', (done) => {
-    let command = new GrantCommand((_a, _b) => (null));
+    let command = new GrantCommand((_a, _b) => (<any>null));
     let readFileStub = sandbox.stub(fs, 'readFile');
     readFileStub.yields(new Error("testing"));
     command.run("testuser", "sample", "readonly").catch(_ => done());

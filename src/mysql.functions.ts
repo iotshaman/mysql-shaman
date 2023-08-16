@@ -1,9 +1,9 @@
-import { Pool, PoolConnection, MysqlError } from "mysql";
+import { Pool, PoolConnection } from "mysql2";
 import { EntityQuery } from "./entity-query";
 
 export function CreateConnection(pool: Pool): Promise<PoolConnection> {
   return new Promise<PoolConnection>((res, err) => {
-    pool.getConnection((connErr: MysqlError, conn: PoolConnection) => {
+    pool.getConnection((connErr: NodeJS.ErrnoException, conn: PoolConnection) => {
       if (connErr) return err(connErr);
       return res(conn);
     });
@@ -17,7 +17,7 @@ export function RunMySqlQuery<T>(
     connection.query(query, args, (mysqlErr, rslt) => {
       if (release) connection.release();
       if (mysqlErr) return err(mysqlErr);
-      return res(rslt);
+      return res(<any>rslt);
     });
   })
 }

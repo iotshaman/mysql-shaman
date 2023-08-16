@@ -1,8 +1,8 @@
-import { PoolConfig } from 'mysql';
+import { PoolOptions } from 'mysql2';
 
 export interface MySqlShamanConfig {
-  poolConfig: PoolConfig;
-  adminPoolConfig?: PoolConfig;
+  poolConfig: PoolOptions;
+  adminPoolConfig?: PoolOptions;
   cwd?: string;
   remote?: boolean;
   scripts?: {

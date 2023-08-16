@@ -1,5 +1,5 @@
-import * as mysql from 'mysql';
-import { Pool, PoolConnection, PoolConfig } from 'mysql';
+import * as mysql from 'mysql2';
+import { Pool, PoolConnection, PoolOptions } from 'mysql2';
 
 import { Collection } from './collection';
 import { RunMySqlQuery, CreateConnection } from './mysql.functions';
@@ -10,7 +10,7 @@ export abstract class DatabaseContext {
   private pool: Pool;
   private transactionConnection: PoolConnection;
 
-  initialize = (config: PoolConfig) => {
+  initialize = (config: PoolOptions) => {
     this.pool = mysql.createPool(config);
     this.loadModels();
   }
@@ -30,19 +30,14 @@ export abstract class DatabaseContext {
   endTransaction = (rollback: boolean = false): Promise<void> => {
     return new Promise<void>((res, err) => {
       if (!this.transactionConnection) return res();
-      if (rollback) this.transactionConnection.rollback(ex => {
-        if (!!ex) {          
-          this.transactionConnection = undefined;
-          return err(ex);
-        }
+      if (rollback) this.transactionConnection.rollback(() => {
         this.transactionConnection.release();
         this.transactionConnection = undefined;
         res();
       });
       else this.transactionConnection.commit(ex => {
-        if (!!ex) this.transactionConnection.rollback(ex2 => {
+        if (!!ex) this.transactionConnection.rollback(() => {
           this.transactionConnection = undefined;
-          if (!!ex2) return err(new Error("A critical error occured while committing."));
           err(ex);
         });
         this.transactionConnection.release();

@@ -1,5 +1,5 @@
 import 'mocha';
-import * as mysql from 'mysql';
+import * as mysql from 'mysql2';
 import * as sinon from "sinon";
 import { expect } from 'chai';
 import { DatabaseContext } from './database.context';
@@ -85,34 +85,6 @@ describe('DatabaseContext', () => {
     subject.sampleBeginTransaction()
       .then(_ => subject.sampleEndTransaction(true))
       .then(_ => done());
-  });
-
-  it('endTransaction should throw on rollback if sql rollback request throws', (done) => {
-    let connection = getDatabaseConnectionMock();
-    connection.rollback = sinon.stub().yields(new Error("Test"));
-    let pool = getDatabasePoolMock(connection);
-    sandbox.stub(mysql, 'createPool').returns(<any>pool);
-    let subject = new SampleDatabaseContext();
-    subject.initialize({});
-    subject.sampleBeginTransaction()
-      .then(_ => subject.sampleEndTransaction(true))
-      .catch(_ => done());
-  });
-
-  it('endTransaction should throw if commit fails and rollback fails', (done) => {
-    let connection = getDatabaseConnectionMock();
-    connection.commit = sinon.stub().yields(new Error("Test"));
-    connection.rollback = sinon.stub().yields(new Error("Test"));
-    let pool = getDatabasePoolMock(connection);
-    sandbox.stub(mysql, 'createPool').returns(<any>pool);
-    let subject = new SampleDatabaseContext();
-    subject.initialize({});
-    subject.sampleBeginTransaction()
-      .then(_ => subject.sampleEndTransaction())
-      .catch(ex => {
-        expect(ex.message).to.equal("A critical error occured while committing.");
-        done();
-      });
   });
 
   it('endTransaction should throw original error if commit fails and rollback succeeds', (done) => {
